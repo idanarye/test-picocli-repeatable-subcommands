@@ -1,21 +1,15 @@
+import java.util.List;
+
 import picocli.CommandLine;
 
 @CommandLine.Command(subcommandsRepeatable = true)
 public class PlotCommandAdd extends PlotCommandBase {
-    public PlotCommandAdd(InvokeWhenDone invokeWhenDone) {
-	super(invokeWhenDone);
-    }
-
     @CommandLine.Parameters
     private String name;
 
-    @Override
-    protected PlotEntry createEntry() {
-	return PlotEntry.buildNew(name);
-    }
+    public void postProcess(List<Object> args) {
+	PlotEntry plotEntry = PlotEntry.buildNew(name, args.toArray());
 
-    @Override
-    protected void invoke(PlotEntry plotEntry) {
 	System.out.printf("Creating new plot %s\n", plotEntry.getName());
 
 	System.out.println("\tIts axes are:");

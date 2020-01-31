@@ -1,43 +1,9 @@
 import picocli.CommandLine;
 
 @CommandLine.Command(subcommandsRepeatable = true)
-public abstract class PlotCommandBase {
-    public static class InvokeWhenDone {
-	private PlotCommandBase commandToCall = null;
-
-	private void set(PlotCommandBase commandToCall) {
-	    if (this.commandToCall != null && this.commandToCall != commandToCall) {
-		throw new RuntimeException("InvokeWhenDone set multiple times");
-	    }
-	    this.commandToCall = commandToCall;
-	}
-
-	public void invoke() {
-	    this.commandToCall.invoke(this.commandToCall.getOrCreateEntry());
-	}
-    }
-
-    public PlotEntry entry = null;
-
-    private InvokeWhenDone invokeWhenDone;
-
-    public PlotCommandBase(InvokeWhenDone invokeWhenDone) {
-	this.invokeWhenDone = invokeWhenDone;
-    }
-
-    protected abstract PlotEntry createEntry();
-    protected abstract void invoke(PlotEntry plotEntry);
-
-    protected PlotEntry getOrCreateEntry() {
-	if (entry == null) {
-	    entry = createEntry();
-	    invokeWhenDone.set(this);
-	}
-	return entry;
-    }
-
+public abstract class PlotCommandBase implements SubcommandPostprocessing {
     @CommandLine.Command(name = "axis")
-    private void axis(
+    private PlotAxis axis(
 	    @CommandLine.Parameters
 	    String caption,
 	    @CommandLine.Parameters
@@ -48,11 +14,11 @@ public abstract class PlotCommandBase {
 	    String unitName
 	    )
     {
-	getOrCreateEntry().getAxes().add(new PlotAxis(caption, scaleType, unitName, expression));
+	return new PlotAxis(caption, scaleType, unitName, expression);
     }
 
     @CommandLine.Command(name = "filter")
-    private void filter(
+    private PlotFilter filter(
 	    @CommandLine.Parameters
 	    String caption,
 	    @CommandLine.Parameters
@@ -63,11 +29,11 @@ public abstract class PlotCommandBase {
 	    String unitName
     )
     {
-	getOrCreateEntry().getFilters().add(new PlotFilter(caption, filterType, unitName, expression));
+	return new PlotFilter(caption, filterType, unitName, expression);
     }
 
     @CommandLine.Command(name = "formula")
-    private void formula(
+    private PlotFormula formula(
 	    @CommandLine.Parameters
 	    String caption,
 	    @CommandLine.Parameters
@@ -80,7 +46,7 @@ public abstract class PlotCommandBase {
 	    String unitName
     )
     {
-	getOrCreateEntry().getFormulas().add(new PlotFormula(caption, symbol, scaleType, unitName, expression));
+	return new PlotFormula(caption, symbol, scaleType, unitName, expression);
     }
 
 }

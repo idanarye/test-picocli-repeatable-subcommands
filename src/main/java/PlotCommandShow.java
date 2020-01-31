@@ -1,18 +1,12 @@
+import java.util.List;
+
 import picocli.CommandLine;
 
 @CommandLine.Command(subcommandsRepeatable = true)
 public class PlotCommandShow extends PlotCommandBase {
-    public PlotCommandShow(InvokeWhenDone invokeWhenDone) {
-	super(invokeWhenDone);
-    }
+    public void postProcess(List<Object> args) {
+	PlotEntry plotEntry = PlotEntry.buildNew("...", args.toArray());
 
-    @Override
-    protected PlotEntry createEntry() {
-	return PlotEntry.buildNew("...");
-    }
-
-    @Override
-    protected void invoke(PlotEntry plotEntry) {
 	System.out.println("Showing plot:");
 
 	System.out.println("\tIts axes are:");
